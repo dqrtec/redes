@@ -1,6 +1,7 @@
 package br.arida.cadim.controllers;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -57,6 +59,30 @@ public class FileUploadController {
         return ResponseEntity.ok().header(HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + file.getFilename() + "\"").body(file);
     }
+    
+    @PostMapping("/json")
+    public String EnvioJson(@RequestBody Map<String, Object> jsonEnviado) {
+    	Ecg e = new Ecg();
+    	e.setPac_id(Integer.parseInt(jsonEnviado.get("pac_id").toString()));
+    	e.setEcg_file(jsonEnviado.get("ecg_file").toString());
+    	e.setImc(Double.parseDouble(jsonEnviado.get("imc").toString()));
+    	e.setMarcapasso( jsonEnviado.get("marcapasso").toString());
+    	e.setPressao_sistolica(Integer.parseInt(jsonEnviado.get("pressao_sistolica").toString()));
+    	e.setCancer(jsonEnviado.get("cancer").toString());
+    	e.setPressao_diastolica(Integer.parseInt(jsonEnviado.get("pressao_diastolica").toString()));
+    	e.setTabagismo(jsonEnviado.get("tabagismo").toString());
+    	e.setAlcoolosmo(jsonEnviado.get("alcoolismo").toString());
+    	e.setSincope(jsonEnviado.get("sincope").toString());
+    	e.setSedentarismo(jsonEnviado.get("sedentarismo").toString());
+    	e.setFibrilacao_flutter(jsonEnviado.get("fibrilacao_fluter").toString());
+    	e.setAvc(jsonEnviado.get("avc").toString());
+
+    	ecgRepository.save(e);
+
+    	e.salvarArquivo(jsonEnviado.get("file").toString());
+    	
+    	return "envio json concluido com sucesso";
+    }
 
     @PostMapping("/")
     public String handleFileUpload(
@@ -79,8 +105,9 @@ public class FileUploadController {
     	e.setPac_id(pac_id);
     	e.setEcg_file(ecg_file);
     	e.setImc(imc);
-    	e.setMarcapasso(marcapasso);
+    	//e.setMarcapasso(marcapasso);
     	e.setPressao_sistolica(pressao_sistolica);
+    	/*
     	e.setCancer(cancer);
     	e.setPressao_diastolica(pressao_diastolica);
     	e.setTabagismo(tabagismo);
@@ -89,7 +116,7 @@ public class FileUploadController {
     	e.setSedentarismo(sedentarismo);
     	e.setFibrilacao_flutter(fibrilacao_fluter);
     	e.setAvc(avc);
-    	
+    	*/
     	ecgRepository.save(e);
     	
         storageService.store(file);
